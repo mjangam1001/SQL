@@ -1,0 +1,27 @@
+1. Get cheapest want for power+age combination.
+wand :- id, code, coins_needed, power
+wandpower :- code , age, is_evil
+
+SELECT w.id, wp.age, w.coins_needed, w.power
+FROM wands w
+JOIN wands_property wp ON w.code = wp.code
+JOIN (SELECT wp1.age, w1.power, MIN(w1.coins_needed) AS coin_needed
+  FROM wands w1
+  JOIN wands_property wp1 ON w1.code = wp1.code
+  WHERE wp1.is_evil = false
+  GROUP BY wp1.age, w1.power) as mc
+  ON w.power = mc.power 
+ AND wp.age = mc.age 
+ AND w.coins_needed = mc.coin_needed
+WHERE wp.is_evil = false
+ORDER BY w.power DESC, wp.age DESC;
+
+
+2. Max submissions make by a student
+select max(mc) from (select h.hacker_id, h.name, count(c.challenge_id) as mc from Hackers h join Challenges c on h.hacker_id = c.hacker_id group by h.hacker_id, h.name) as submissionsselect max(mc) from (select h.hacker_id, h.name, count(c.challenge_id) as mc from Hackers h join Challenges c on h.hacker_id = c.hacker_id group by h.hacker_id, h.name) as sub
+
+2. Users with same number of challenges
+select h.hacker_id, h.name, count(c.challenge_id) as mc from Hackers h join Challenges c on h.hacker_id = c.hacker_id join (select h.hacker_id, h.name, count(c.challenge_id) as mc from Hackers h join Challenges c on h.hacker_id = c.hacker_id group by h.hacker_id, h.name) as sub
+where h.hacker_id != sub.hacker_id and mc = sub.mc
+group by h.hacker_id, h.name 
+order by mc

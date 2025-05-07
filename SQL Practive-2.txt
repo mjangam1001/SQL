@@ -1,0 +1,187 @@
+SQL Practive-2
+
+-- Departments table
+CREATE TABLE Departments (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50)
+);
+
+-- Employees table
+CREATE TABLE Employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(100),
+    dept_id INT,
+    salary DECIMAL(10,2),
+    manager_id INT,
+    FOREIGN KEY (dept_id) REFERENCES Departments(dept_id)
+);
+
+-- Projects table
+CREATE TABLE Projects (
+    project_id INT PRIMARY KEY,
+    project_name VARCHAR(100),
+    dept_id INT,
+    FOREIGN KEY (dept_id) REFERENCES Departments(dept_id)
+);
+
+-- Employee-Project mapping
+CREATE TABLE EmployeeProjects (
+    emp_id INT,
+    project_id INT,
+    hours_worked INT,
+    PRIMARY KEY (emp_id, project_id),
+    FOREIGN KEY (emp_id) REFERENCES Employees(emp_id),
+    FOREIGN KEY (project_id) REFERENCES Projects(project_id)
+);
+
+
+INSERT INTO Departments (dept_id, dept_name) VALUES
+(1, 'HR'),
+(2, 'IT'),
+(3, 'Finance'),
+(4, 'Operations'),
+(5, 'Sales');
+
+
+INSERT INTO Employees (emp_id, emp_name, dept_id, salary, manager_id) VALUES
+(101, 'Alice', 1, 60000, NULL),
+(102, 'Bob', 2, 75000, 101),
+(103, 'Charlie', 2, 50000, 101),
+(104, 'David', 3, 40000, 101),
+(105, 'Eve', 4, 80000, 101),
+(106, 'Frank', 2, 30000, 102),
+(107, 'Grace', 5, 55000, NULL),
+(108, 'Hannah', NULL, 45000, NULL),
+(109, 'Ian', 5, 38000, 107),
+(110, 'Jack', 5, 62000, 107);
+
+
+INSERT INTO Projects (project_id, project_name, dept_id) VALUES
+(201, 'Project Phoenix', 2),
+(202, 'Project Aurora', 3),
+(203, 'Project Titan', 5),
+(204, 'Project Mercury', 1),
+(205, 'Project Neptune', NULL);
+
+
+INSERT INTO EmployeeProjects (emp_id, project_id, hours_worked) VALUES
+(102, 201, 40),
+(103, 201, 35),
+(104, 202, 20),
+(105, 202, 30),
+(107, 203, 25),
+(109, 203, 15),
+(110, 203, 40),
+(106, 204, 10);
+
+
+
+1.List all employees with their department names.
+select e.emp_id ,e.emp_name ,e.dept_id ,d.dept_name from employees e join departments d on e.dept_id = d.dept_id;
+
+2.List all employees and their department names, including those without departments.
+select e.emp_id ,e.emp_name ,e.dept_id ,d.dept_name from employees e left join departments d on e.dept_id = d.dept_id;
+
+3.List all departments and their employees, including departments without any employees.
+select e.emp_id ,e.emp_name ,e.dept_id ,d.dept_name from employees e right join departments d on e.dept_id = d.dept_id;
+
+4.List all employees who are assigned to projects.
+select * from employees e join employeeprojects e2 on e.emp_id = e2.emp_id; 
+
+5.List all projects with the employees working on them.
+select * from projects p left join employeeprojects e on p.project_id = e.project_id left join employees e2 on e.emp_id = e2.emp_id 
+
+6.List employees with salary greater than 50000 and their department names.
+select e.emp_id ,e.emp_name ,e.dept_id, e.salary ,d.dept_name from employees e join departments d on e.dept_id = d.dept_id where salary > 50000;
+
+7.List employees with department names sorted by salary descending.
+select e.emp_id ,e.emp_name ,e.dept_id, e.salary ,d.dept_name from employees e join departments d on e.dept_id = d.dept_id order by salary desc;
+
+8.List all employees working in the "Finance" department.
+select e.emp_id ,e.emp_name ,e.dept_id, e.salary ,d.dept_name from employees e join departments d on e.dept_id = d.dept_id where d.dept_name = 'Finance';
+
+9.List departments that have no employees.
+select e.emp_id ,e.emp_name ,e.dept_id, e.salary ,d.dept_name from departments d left join employees e on e.dept_id = d.dept_id where e.dept_id is null;
+
+10.Find total hours worked by each employee across all projects.
+select e.emp_id , sum(e2.hours_worked) from employees e left join employeeprojects e2 on e.emp_id = e2.emp_id group by e.emp_id;
+
+11.Show average salary per department.
+select d.dept_id ,avg(e.salary) from departments d join employees e on d.dept_id = e.dept_id group by d.dept_id ;
+
+12.List all distinct department names where employees are working on projects.
+select distinct(d.dept_name) from employees e join employeeprojects e2 on e.emp_id = e2.emp_id join departments d on e.dept_id = d.dept_id; 
+
+13.List employees and their managers in the same department.
+select * from employees e join employees e2 on e.manager_id  = e2.emp_id where e.dept_id = e2.dept_id 
+
+
+14.Find employees who are not assigned to any project.
+select * from employees e left join employeeprojects e2 on e.emp_id = e2.emp_id where e2.project_id is null; 
+
+15.List projects not handled by employees in the "IT" department.
+select distinct p.project_name from employees e join employeeprojects e2 on e.emp_id = e2.emp_id join projects p on p.project_id =e2.project_id  join departments d on e.dept_id = d.dept_id 
+where d.dept_name <> 'IT'
+
+16.List employees whose salary is greater than the average salary of their department.
+select * from employees e2 join departments d2 on e2.dept_id = d2.dept_id where salary > (select avg(e.salary) from employees e join departments d on e.dept_id =d.dept_id where d.dept_id  = d2.dept_id  group by d.dept_id);
+
+17.Show employee names and a column indicating if they are assigned to a project.
+select *, case when e2.project_id is null then 'false' else 'true' end as isProjectAssigned from employees e left join employeeprojects e2 on e.emp_id = e2.emp_id;
+
+18.List all employees and all projects with possible matches.
+SELECT e.emp_name, p.project_name
+FROM employees e
+FULL OUTER JOIN employeeprojects ep ON e.emp_id = ep.emp_id
+FULL OUTER JOIN projects p ON ep.project_id = p.project_id;
+
+
+19.List departments having more than 2 employees with salary above 70000.
+select e.dept_id, count(e.emp_id) as cou from employees e join departments d on e.dept_id = d.dept_id where e.salary >= 50000 group by e.dept_id having count(e.emp_id)>=2 ; 
+
+20.List departments and the top 1 highest-paid employee in each.
+select d1.dept_name , e1.emp_name from employees e1 join departments d1 on e1.dept_id = d1.dept_id where e1.salary = (select max(e.salary) from employees e join departments d on e.dept_id = d.dept_id where d.dept_id = d1.dept_id  group by d.dept_id); 
+
+21.Rank employees within each department by salary.
+select *,rank() over (partition by e.dept_id order by e.salary desc) from employees e join departments d on e.dept_id = d.dept_id  
+
+22.List employees, their manager, and the manager’s department.
+select e.emp_id , e.emp_name , e2.emp_id , e2.emp_name  from employees e left join employees e2 on e.manager_id = e2.emp_id; 
+
+23.Find all employees directly or indirectly reporting to a specific manager.
+
+
+24.Show all departments and all projects with NULLs where no match exists.
+select * from departments d full join projects p on d.dept_id = p.dept_id; 
+
+25.List all employees who do not report to any manager.
+select * from employees e where e.manager_id is null;
+
+26.List all departments that have at least one employee.
+select e.dept_id , count(e.emp_id) from employees e join departments d on e.dept_id = d.dept_id group by e.dept_id having count(e.emp_id) >= 1
+
+
+28.Find the employee with the second highest salary in each department.
+select * from (
+select *, rank() over (partition by e.dept_id order by e.salary desc) as rankk from employees e join departments d on e.dept_id  = d.dept_id
+)sub
+where sub.rankk = 2
+
+30.List employees, their department, and the projects they work on.
+select * from employees e join departments d on e.dept_id = d.dept_id join projects p on p.dept_id = d.dept_id join employeeprojects e2 ON e2.emp_id = e.emp_id; 
+
+31.List top 2 employees with highest salaries
+select * from employees e order by e.salary desc limit 2
+
+32. get the 2nd highest salary
+select * from employees e order by e.salary desc limit 1 offset 1
+
+32.List top 2 employees with highest salaries in each department
+select * from (
+select *, rank() over (partition by e.dept_id order by e.salary desc) as rankk from employees e join departments d on e.dept_id  = d.dept_id
+)sub
+where sub.rankk in (1,2)
+
+
+27.Show entire management hierarchy starting from the top manager.
+--PARKED

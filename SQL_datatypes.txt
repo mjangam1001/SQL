@@ -1,0 +1,96 @@
+SQL Notes
+
+BASICS
+
+1. Data types :- Each column in sql must have a data type.
+	1. Int/Integer
+	2. Small Int
+	3. Tiny Int
+	4. Big Int
+	5. Decimal(p,s) , Numeric(p,s)
+	6. Float
+	7. Real
+	8. Double Precision
+	
+	1. Char(n) :- fixed length string
+	2. Varchar(n) :- variable length string
+	3. NChar(n) :- unicode fixed length string
+	4. NVarchar(n) :- unicode variable length string
+	5. Text :- very large text file
+	
+	1. Date
+	2. Time
+	3. DateTime
+	4. Timestamp
+	5. Year
+	6. Interval
+	
+	1. Boolean
+	
+	1. Binary
+	2. VarBinary
+	3. BLOB (Binary Large Object)
+	
+	1. JSON
+	2. UUID
+	3. XML
+	4. Enum
+	5. Array
+	6. Set
+	7. Geometry /geography
+
+	
+MySQL: Allows TINYINT, MEDIUMINT, ENUM, SET, YEAR
+PostgreSQL: Has ARRAY, JSONB, UUID, and rich time functions
+SQL Server: Has UNIQUEIDENTIFIER, NTEXT, IMAGE (deprecated), MONEY
+Oracle: Uses CLOB, BLOB, NUMBER, VARCHAR2, DATE for both date and datetime
+	
+1. Char vs Varchar vs TEXT
+=> Default lenght of char is 1. Char is a fixed length string. It pads white spaces in the space after storing the value. retrieval is faster. Ideal when string lenght is fixed e.g., country_code, gender flag etc
+Varchar has variable lenght. Lenght must be mentioned in some databases. If not mentioned, default lenght of 1 or unlimited is assigned or error is thrown as per the used database. No white space padding. Memory efficient. Retrieval is slower compared to char
+TEXT is unlimited string. Some DBs don't allow indexing or function for this type. In postgres, Varchar, Varchar(n) & Text can be used interchangabaly.
+
+2. Decimal(p,s) vs Float vs Real
+=>Decimal is the exact precision. No rounding off allowed. Slow as compared to float. Takes space as per the precision. Ideal for money, acoounting, etc
+Float is approsimate. May loose some precison & round off. Takes fixes space. Faster than Decimal. Ideal when fast computation is required.
+Least precision. Fastest. Least accurate.
+
+3. What happens if a longer string is assigned to a char with lesser size?
+=> Depending on the databse, there will an error or silent truncate.
+Postgres throws error.
+
+4. How Boolean is treated in different RDBMS?
+=> Postgres natively supports boolean. accepts only true/false
+MySQL uses TinyInt(1). accepts 0 or any number other than 0 is treated as positive. true/false is accepted & converted on 1 & 0
+SQL server used bit. accepts only 1 & 0
+
+5. How to use JSONB
+=> prefer JsonB over Json. As JsonB is parsed & stored in Binary whereas Json is stored as text.
+JSONB is faster. Supports indexing. Order or keys is not preserved. Duplicate keys are not preserved. 
+JSON is slower.Doesn't support indexing. Order or keys is preserved. Duplicate keys are preserved.
+We can access individual fields of json.
+SELECT profile_data->'name' FROM users;   -- Result: "Anita"
+SELECT profile_data->>'name' FROM users;  -- Result: Anita
+SELECT * FROM users WHERE profile_data->>'age' = '27'
+SELECT * FROM users WHERE profile_data @> '{"skills": ["SQL"]}'
+
+6. How to cast?
+=> cast using :: in postgres of cast(as newDataType)
+
+7. Can we have a custom type?
+=> CREATE TYPE address_type AS (
+  street TEXT,
+  city TEXT,
+  zip TEXT
+); This is also a way to store a composite type in a column.
+
+8. What should be used to store zip codes/ account numbers?
+=> Char. so that initial 00s will be preserved
+
+9. Cast vs Convert
+=> Cast is easier, portable across dbs
+Convert is limited to sql server. preserves format.
+
+
+ 
+ 

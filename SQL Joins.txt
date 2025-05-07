@@ -1,0 +1,4 @@
+SQL JOINS
+
+** Join can be done using <= ,>= , < , > operators as well. We dont always have to gp for = .
+It is advised to be careful while using these non-equi joins as they can produce huge result set / slower / can produce duplicates

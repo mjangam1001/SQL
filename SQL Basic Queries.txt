@@ -1,0 +1,105 @@
+SQL Basic Queries
+
+
+Data Query Language :-
+1. Select
+Select * from table; //returns all rows
+Select column1, column2, column 3 from table; //returns only mentioned columns
+Select into table2 from table // copies data from table to table 2
+
+
+Data Manupulation Language
+1. Insert
+Insert into tabale values ('value1', 'value2')
+Insert into table ('column1','column2') values ('value1','value2')
+Insert into table values ('value1','value2'),('value3','value4') //multiple rows insert
+Insert into table (value1,value2) select value1, value2 from table2;  // insert values from different table
+Insert into table set id = value1 on conflict(id) do update set id = 1;  //handle duplicate insertions
+Insert into table set id = value1 on conflict(id) do ignore
+Insert into table (value1,value2) returning value1, value2  // returns value after insert
+Insert into config DEFAULT VALUES; // insert default values
+
+
+2. Update
+Update table set field=value where condition.
+Update table set field=select value from2 table where condition. //update with select from another table
+Update table set field=  case when condition1 then value1 else value2 end  //update with case
+Update table set field=value where condition returnign value1.  //upate with returning
+
+
+3. Delete
+Delete from table
+Delete from table using table 2 where table.col1 = table2.col2 and condition // this deletes records from table1 only
+delete from table returning value1  // returns value after delete
+
+Date Definition Language
+1. Create
+Create table tablename (columnname1 columntype1, columnname2 columntype3, columnname3 columntype3)
+Create table if not exists tablename (columnname1 columntype1, columnname2 columntype3, columnname3 columntype3) //avoids error if table already exists
+
+2. Alter
+Alter table table1 add column columnname columntype
+Alter table table1 drop column columnname
+Alter table table1 rename column columnname to newcolumnname
+Alter table table1 rename to newtablename
+
+
+3. Drop
+Drop table table1
+Drop table table1 if exists
+
+
+
+Aggregate functions
+perform a calculation on a set of values and return a single summary value
+Count(), Sum(), Avg(), Min(), Max()
+
+->Cannot use aggregate functions directly in WHERE. Must use in HAVING or subquery.
+->Performance can degrade on large datasets without indexes or proper GROUP BY design.
+->DISTINCT within aggregates (e.g., COUNT(DISTINCT col)) can be expensive.
+->NULLs are ignored
+->Nesting of aggregate functions is not allowed e.g., (max(sum(amount))  
+->If parameters from outer query are not visible inside inner query. use CTE in such case
+
+
+Execution order
+
+From , Join -> Where -> Group by -> Having -> Select -> Order by 
+
+
+Group by clause
+-> The GROUP BY clause in SQL is used to aggregate data by one or more columns. It groups rows that share a common value, allowing aggregate functions (like SUM, AVG, COUNT, etc.) to be applied to each group.
+1. Select columns must be in a group by or an aggregate function
+2. Having is used for filtering AFTER the grouping
+3. We can't use alias in group by as it is executed before select
+4. We can use alias in order by as it is executed after select
+5. If dept_id → dept_name, SQL engines like PostgreSQL or MySQL (without ONLY_FULL_GROUP_BY) allow you to select dept_name without putting it in the GROUP BY clause, because it's functionally dependent.
+6. GROUP BY treats NULL values as a distinct group.
+
+Having :- Used to filter aggregated/grouped results. Can’t be used without GROUP BY unless there's an aggregate.
+
+In/Not In :- Used in WHERE clauses to filter rows where a column’s value is (or is not) within a specified list or result of a subquery.
+NOT IN with a subquery that returns NULL can produce no results unexpectedly.
+Prefer NOT EXISTS over NOT IN for subqueries when NULL is possible.
+
+Exists/Not Exists :- Checks for the existence of rows in a subquery.
+
+Between :- Checks for existence within given range (inclusive of lower & upper limit)
+
+1) What is security definer in postgres?
+=> Usually a function runs with the privilege of a callee. But sometimes we need to return a sensitive data to low privilege user. 
+In such scenario we can use security definer. With security definer a function is called with privilege of creator and not the current user.
+Eg :- I want to restrict a user from seeing salary table. But I want to give her access to the function which returns average salary.
+Not using this feature cautiously can create security loop holes.
+
+2) What is STRING_AGG
+STRING_AGG(expression, delimiter [ORDER BY sort_expression])
+expression: The text value you want to combine.
+delimiter: A string used to separate values (e.g., ', ').
+ORDER BY (optional): Sort the values before concatenation.
+eg :- SELECT customer_id, STRING_AGG(product, ', ') AS product_list
+FROM orders
+GROUP BY customer_id;
+
+3)SQL Best Practices
+Always use WHERE to reduce data before grouping for performance.
