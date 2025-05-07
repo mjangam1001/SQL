@@ -86,6 +86,10 @@ Exists/Not Exists :- Checks for the existence of rows in a subquery.
 
 Between :- Checks for existence within given range (inclusive of lower & upper limit)
 
+COALESCE :- returns 1st non null value for given column.
+SELECT name, COALESCE(bonus, 0) AS bonus FROM employees; //gives value from bonus or 0 if null
+
+
 1) What is security definer in postgres?
 => Usually a function runs with the privilege of a callee. But sometimes we need to return a sensitive data to low privilege user. 
 In such scenario we can use security definer. With security definer a function is called with privilege of creator and not the current user.
